@@ -1,0 +1,22 @@
+EVALUATE
+ROW(
+    "Categorias", COUNTROWS('Categorias'),
+    "Clientes", COUNTROWS('Clientes'),
+    "DetallePedido", COUNTROWS('DetallePedido'),
+    "DetalleVenta", COUNTROWS('DetalleVenta'),
+    "Empleados", COUNTROWS('Empleados'),
+    "EstadosPedido", COUNTROWS('EstadosPedido'),
+    "PedidosProveedor", COUNTROWS('PedidosProveedor'),
+    "Productos", COUNTROWS('Productos'),
+    "Proveedores", COUNTROWS('Proveedores'),
+    "Ventas", COUNTROWS('Ventas'),
+    "Unidades", SUM('DetalleVenta'[Cantidad]),
+    "TotalVentaCabecera", ROUND(SUM('Ventas'[Total]), 2),
+    "TotalVentaDetalle", ROUND(SUMX('DetalleVenta', 'DetalleVenta'[Cantidad] * 'DetalleVenta'[PrecioUnitario]), 2),
+    "DiferenciaTotal", ROUND(SUM('Ventas'[Total]) - SUMX('DetalleVenta', 'DetalleVenta'[Cantidad] * 'DetalleVenta'[PrecioUnitario]), 2),
+    "NulosDetalle", COALESCE(COUNTROWS(FILTER('DetalleVenta', ISBLANK('DetalleVenta'[IdDetalle]) || ISBLANK('DetalleVenta'[IdVenta]) || ISBLANK('DetalleVenta'[IdProducto]) || ISBLANK('DetalleVenta'[Cantidad]) || ISBLANK('DetalleVenta'[PrecioUnitario]) || ISBLANK('DetalleVenta'[Subtotal]))), 0),
+    "IdDetalleDuplicados", COUNTROWS('DetalleVenta') - DISTINCTCOUNT('DetalleVenta'[IdDetalle]),
+    "VentasHuerfanas", COALESCE(COUNTROWS(FILTER('DetalleVenta', ISBLANK(RELATED('Ventas'[IdVenta])))), 0),
+    "ProductosHuerfanos", COALESCE(COUNTROWS(FILTER('DetalleVenta', ISBLANK(RELATED('Productos'[IdProducto])))), 0),
+    "ProductosCompraMayorVenta", COUNTROWS(FILTER('Productos', 'Productos'[PrecioCompra] > 'Productos'[PrecioVenta]))
+)
